@@ -1,0 +1,7 @@
+.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: all !important;
+  transform: translateY(0) !important;
+  transition: visibility 1.2s ease, opacity 1.2s ease, transform 0.4s ease !important;
+}

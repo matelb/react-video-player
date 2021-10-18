@@ -1,0 +1,45 @@
+.volumeControls:hover input,
+.volumeControls input:focus {
+  visibility: visible;
+  //opacity: 1;
+  max-width: 100%;
+  transition: visibility 0.75s ease-in, max-width 0.75s;
+}
+
+.volume {
+  &::-webkit-slider-runnable-track {
+    background-color: transparent;
+    cursor: pointer;
+  }
+  &::-moz-range-track {
+    width: 100%;
+    height: 18.4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 1.3px;
+  }
+  &::-webkit-slider-thumb {
+    margin-left: 0;
+    height: 14px;
+    width: 14px;
+    background: #fff;
+  }
+
+  &::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    border-radius: 50px;
+    border: 1px solid var(--youtube-red);
+    background: var(--youtube-red);
+    cursor: pointer;
+    margin-top: 5px;
+  }
+  &::-moz-range-thumb {
+    border: 1px solid #fff;
+    background: #fff;
+  }
+  &:focus::-moz-range-track {
+    outline: none;
+  }
+}
