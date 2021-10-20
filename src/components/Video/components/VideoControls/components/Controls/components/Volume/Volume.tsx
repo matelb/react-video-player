@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import { INITIALCONFIGURATION } from "../../../../Utilities/Config";
 import styles from "./Volume.module.scss";
+import { isMobile, isTablet } from "react-device-detect";
 
 export type VolumeLevel = "high" | "low" | "muted";
 
@@ -81,19 +82,22 @@ const Volume = ({
 
   return (
     <VolumeContainer className={styles.volumeControls}>
-      <VolumeBarContainer containerColor={containerColor}>
-        <VolumeStyled
-          ref={volumeRef}
-          className={styles.volume}
-          data-volume={volumeLevel}
-          type="range"
-          aria-orientation="vertical"
-          onChange={(event) => handleVolumeChange(event.target.value)}
-          thumbColor={thumbColor}
-          barColor={barColor}
-          backgroundBarColor={backgroundBarColor}
-        />
-      </VolumeBarContainer>
+      {!isMobile && !isTablet ? (
+        <VolumeBarContainer containerColor={containerColor}>
+          <VolumeStyled
+            ref={volumeRef}
+            className={styles.volume}
+            data-volume={volumeLevel}
+            type="range"
+            aria-orientation="vertical"
+            onChange={(event) => handleVolumeChange(event.target.value)}
+            thumbColor={thumbColor}
+            barColor={barColor}
+            backgroundBarColor={backgroundBarColor}
+          />
+        </VolumeBarContainer>
+      ) : null}
+
       <Button
         data-title={volumeLevel === "muted" ? "Unmute (m)" : "Mute (m)"}
         onClick={() => handleClick()}

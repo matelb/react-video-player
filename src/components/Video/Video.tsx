@@ -5,6 +5,7 @@ import Controls from "./components/VideoControls/components/Controls";
 import {
   defaultCursor,
   formatTime,
+  getVideoQualities,
   getVolumeLevel,
   removeCursor,
 } from "./tools";
@@ -12,6 +13,7 @@ import styled from "styled-components";
 import {
   FullScreen,
   PIP,
+  QualitySelect,
   VideoProgress,
   Volume,
 } from "./components/VideoControls/components/Controls/components";
@@ -23,6 +25,7 @@ import {
 } from "./components/VideoControls/components/Controls/components/TimeElapsed";
 import { CONTROLSHIDETIME } from "./components/VideoControls/Utilities/Config";
 import { Preload, VideoList, VideoTags } from "./types";
+import _ from "lodash";
 
 interface VideoProps {
   videos: VideoList[];
@@ -78,6 +81,7 @@ const Video = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [buffered, setBuffered] = useState<number>(0);
   const [fullScreen, setFullScreen] = useState<boolean>(false);
+  const [quality, setQuality] = useState<string>();
   const [disabledPIP, setDisabledPIP] = useState<boolean>(false);
   const [mouseMoving, setMouseMoving] = useState<boolean>(false);
   const [videoMoving, setVideoMoving] = useState<boolean>(false);
@@ -101,6 +105,7 @@ const Video = ({
     const video = videoRef.current;
     if (video) {
       video.controls = false;
+      video.volume = 1;
       document.addEventListener("keyup", keyboardShortcuts);
       document.addEventListener("fullscreenchange", () => exitFullscreen());
     }
@@ -346,6 +351,8 @@ const Video = ({
     }
   };
 
+  const qualities = _.uniq(getVideoQualities(videos));
+
   return (
     <>
       <Container
@@ -442,6 +449,9 @@ const Video = ({
                   fullScreen={fullScreen}
                   color={buttonsColor}
                 />
+                {qualities && qualities.length > 1 ? (
+                  <QualitySelect qualities={qualities} />
+                ) : null}
               </RightControls>
             </Controls>
           </VideoControls>

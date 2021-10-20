@@ -1,7 +1,7 @@
 // formatTime takes a time length in seconds and returns the time in
 
 import { VolumeLevel } from "./components/VideoControls/components/Controls/components/Volume/Volume";
-import { Time } from "./types";
+import { Time, VideoList, VideoQuality } from "./types";
 
 // minutes and seconds and hours
 export function formatTime(timeInSeconds: number) {
@@ -56,4 +56,13 @@ export function removeCursor(
   if (video) {
     video.style.cursor = "none";
   }
+}
+
+export function getVideoQualities(videos: VideoList[]): VideoQuality[] {
+  const list: VideoQuality[] = [];
+  videos.map((v) => {
+    if (v.quality) list.push(v.quality);
+  });
+
+  return list;
 }

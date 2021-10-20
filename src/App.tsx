@@ -18,6 +18,11 @@ const videos3: VideoList[] = [
     type: "video/mp4",
     src: "forest.mp4",
   },
+  {
+    quality: "1080p",
+    type: "video/webm",
+    src: "http://edge-assets.wirewax.com/blog/vidData/example1080.webm",
+  },
 ];
 
 const videos2: VideoList[] = [
@@ -57,7 +62,7 @@ const tags: VideoTags[] = [
 function App() {
   return (
     <div className="App">
-      <div style={{ width: 800 }}>
+      <div>
         <Video
           videos={videos3}
           // poster="poster.jpg"

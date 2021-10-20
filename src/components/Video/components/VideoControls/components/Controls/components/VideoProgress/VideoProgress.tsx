@@ -4,6 +4,7 @@ import { formatTime, getPercentageOfTotal } from "../../../../../../tools";
 import { VideoTags } from "../../../../../../types";
 import { INITIALCONFIGURATION } from "../../../../Utilities/Config";
 import { Duration } from "../TimeElapsed/types";
+import { isMobile, isTablet } from "react-device-detect";
 
 interface VideoProgressProps {
   max: number;
@@ -102,11 +103,13 @@ const VideoProgress = ({
         backgroundBarColor={backgroundBarColor}
         thumbColor={thumbColor}
       />
-      <Tooltip ref={tooltipRef} color={textColor}>
-        <span>
-          {tooltipTime.hours}:{tooltipTime.minutes}:{tooltipTime.seconds}
-        </span>
-      </Tooltip>
+      {!isMobile && !isTablet ? (
+        <Tooltip ref={tooltipRef} color={textColor}>
+          <span>
+            {tooltipTime.hours}:{tooltipTime.minutes}:{tooltipTime.seconds}
+          </span>
+        </Tooltip>
+      ) : null}
     </VideoProgressStyled>
   );
 };

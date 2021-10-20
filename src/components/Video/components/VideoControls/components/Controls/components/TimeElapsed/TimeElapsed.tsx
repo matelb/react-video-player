@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { COLORBASE } from "../../../../Utilities/Color";
+import { Color } from "../../../../Utilities/Color";
 import { Duration } from "./types";
 
 interface TimeElapsedProps {
@@ -26,7 +26,7 @@ export default TimeElapsed;
 
 const TimeElapsedStyled = styled.div`
   span {
-    color: ${COLORBASE};
+    color: ${Color.COLORBASE};
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -35,7 +35,7 @@ const TimeElapsedStyled = styled.div`
     user-select: none;
   }
   time {
-    color: ${COLORBASE};
+    color: ${Color.COLORBASE};
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
