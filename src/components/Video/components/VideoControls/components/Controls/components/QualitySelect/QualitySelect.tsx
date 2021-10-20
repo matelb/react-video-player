@@ -1,27 +1,30 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { getQualityVideosSorted } from "../../../../../../tools";
 import { VideoQuality } from "../../../../../../types";
 import { Color } from "../../../../Utilities/Color";
-import Select from "../../../Common/Select";
 
 interface QualitySelectProps {
   qualities: VideoQuality[];
   disabled?: boolean;
   onChange?: (value: VideoQuality) => void;
+  value: VideoQuality;
 }
 
 const QualitySelect = ({
   qualities,
   disabled,
   onChange,
+  value,
 }: QualitySelectProps) => {
-  const [value, setValue] = useState<VideoQuality>(qualities[0]);
+  const [_value, setValue] = useState<VideoQuality>(value);
   const [open, setOpen] = useState<boolean>(false);
 
   const onOptionClicked = (item: VideoQuality) => () => {
     if (disabled) return;
     if (onChange && item) {
-      onChange(value);
+      onChange(item);
+      setValue(item);
     } else {
       if (item) {
         setValue(item);
@@ -64,12 +67,12 @@ const QualitySelect = ({
           }}
         >
           <DropDownList>
-            {qualities.map((item, i) => {
+            {getQualityVideosSorted(qualities).map((item, i) => {
               return (
                 <ListItem
                   onClick={onOptionClicked(item)}
                   key={i}
-                  selected={item === value}
+                  selected={item === _value}
                 >
                   <ListItemText>{item}</ListItemText>
                 </ListItem>

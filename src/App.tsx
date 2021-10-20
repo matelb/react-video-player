@@ -3,6 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import Video from "./components/Video";
 import { VideoList, VideoTags } from "./components/Video/types";
+import { isMobile, isTablet } from "react-device-detect";
 
 const videos: VideoList[] = [
   {
@@ -13,6 +14,16 @@ const videos: VideoList[] = [
 ];
 
 const videos3: VideoList[] = [
+  {
+    quality: "4k",
+    type: "video/mp4",
+    src: "forest.mp4",
+  },
+  {
+    quality: "480p",
+    type: "video/mp4",
+    src: "forest.mp4",
+  },
   {
     quality: "720p",
     type: "video/mp4",
@@ -61,7 +72,7 @@ const tags: VideoTags[] = [
 
 function App() {
   return (
-    <div className="App">
+    <div className="App" style={{ width: isMobile ? "auto" : "800px" }}>
       <div>
         <Video
           videos={videos3}

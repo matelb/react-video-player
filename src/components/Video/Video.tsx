@@ -6,6 +6,7 @@ import {
   defaultCursor,
   formatTime,
   getVideoQualities,
+  getVideos,
   getVolumeLevel,
   removeCursor,
 } from "./tools";
@@ -24,7 +25,7 @@ import {
   TotalTime,
 } from "./components/VideoControls/components/Controls/components/TimeElapsed";
 import { CONTROLSHIDETIME } from "./components/VideoControls/Utilities/Config";
-import { Preload, VideoList, VideoTags } from "./types";
+import { Preload, VideoList, VideoQuality, VideoTags } from "./types";
 import _ from "lodash";
 
 interface VideoProps {
@@ -81,7 +82,7 @@ const Video = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [buffered, setBuffered] = useState<number>(0);
   const [fullScreen, setFullScreen] = useState<boolean>(false);
-  const [quality, setQuality] = useState<string>();
+  const [quality, setQuality] = useState<VideoQuality>("1080p");
   const [disabledPIP, setDisabledPIP] = useState<boolean>(false);
   const [mouseMoving, setMouseMoving] = useState<boolean>(false);
   const [videoMoving, setVideoMoving] = useState<boolean>(false);
@@ -191,12 +192,15 @@ const Video = ({
   const updateTimeElapsed = () => {
     const video = videoRef.current;
     if (video) {
-      const time = formatTime(Math.round(video.currentTime));
-      setTimeElapsed(time);
-      const timeLeft = formatTime(
-        Math.round(video.duration - video.currentTime)
-      );
-      setDuration(timeLeft);
+      const currentTime = video.currentTime;
+      if (currentTime > 0) {
+        const time = formatTime(Math.round(video.currentTime));
+        setTimeElapsed(time);
+        const timeLeft = formatTime(
+          Math.round(video.duration - video.currentTime)
+        );
+        setDuration(timeLeft);
+      }
     }
   };
 
@@ -340,14 +344,26 @@ const Video = ({
       var bf = video.buffered;
       var time = video.currentTime;
       if (bf.length > 0) {
-        while (!(bf.start(range) <= time && time <= bf.end(range))) {
-          range += 1;
+        try {
+          while (!(bf.start(range) <= time && time <= bf.end(range))) {
+            range += 1;
+          }
+          var loadStartPercentage = bf.start(range) / video.duration;
+          var loadEndPercentage = bf.end(range) / video.duration;
+          var loadPercentage = loadEndPercentage - loadStartPercentage;
+          setBuffered(loadPercentage);
+        } catch (error) {
+          console.log(error);
         }
-        var loadStartPercentage = bf.start(range) / video.duration;
-        var loadEndPercentage = bf.end(range) / video.duration;
-        var loadPercentage = loadEndPercentage - loadStartPercentage;
-        setBuffered(loadPercentage);
       }
+    }
+  };
+
+  const onQualityChange = (quality: VideoQuality) => {
+    const video = videoRef.current;
+    if (video) {
+      setQuality(quality);
+      video.load();
     }
   };
 
@@ -396,7 +412,7 @@ const Video = ({
           }}
           onProgress={(v) => onProgress(v)}
         >
-          {videos.map((video, i) => (
+          {getVideos(videos, quality).map((video, i) => (
             <source src={video.src} type={video.type} key={i}></source>
           ))}
           Your browser does not support HTML5 video.
@@ -450,7 +466,11 @@ const Video = ({
                   color={buttonsColor}
                 />
                 {qualities && qualities.length > 1 ? (
-                  <QualitySelect qualities={qualities} />
+                  <QualitySelect
+                    value={quality}
+                    qualities={qualities}
+                    onChange={onQualityChange}
+                  />
                 ) : null}
               </RightControls>
             </Controls>

@@ -4,8 +4,18 @@ export type VideoQuality =
   | "1080p"
   | "1440p"
   | "2k"
-  | "4K"
+  | "4k"
   | "8k";
+
+export enum VideoQualityEnum {
+  "480p",
+  "720p",
+  "1080p",
+  "1440p",
+  "2k",
+  "4k",
+  "8k",
+}
 type VideoType = "video/mp4" | "video/ogg" | "video/webm" | "video/3gp";
 export type Preload = "metadata" | "auto" | "none";
 

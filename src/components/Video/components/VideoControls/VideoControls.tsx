@@ -1,8 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import cn from "classnames";
 import styles from "./VideControls.module.scss";
-import { defaultCursor, removeCursor } from "../../tools";
 import { CONTROLSHIDETIME } from "./Utilities/Config";
 
 interface VideoControlsProps {
@@ -33,7 +32,7 @@ const VideoControls = ({
 
   return (
     <VideoControlsStyled
-      className={cn({ [styles.show]: show || true })}
+      className={cn({ [styles.show]: show || showControls })}
       onMouseEnter={() => {
         if (!fullScreen) {
           setShowControls(true);

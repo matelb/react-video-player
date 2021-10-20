@@ -1,7 +1,46 @@
 // formatTime takes a time length in seconds and returns the time in
 
 import { VolumeLevel } from "./components/VideoControls/components/Controls/components/Volume/Volume";
-import { Time, VideoList, VideoQuality } from "./types";
+import { Time, VideoList, VideoQuality, VideoQualityEnum } from "./types";
+import _ from "lodash";
+
+export function getVideos(
+  videos: VideoList[],
+  quality?: VideoQuality
+): VideoList[] {
+  if (!quality) return videos;
+
+  const defaultVideos = videos.filter((v) => v.quality === quality);
+  if (defaultVideos.length > 0) return defaultVideos;
+  const qualities = getVideoQualities(videos).map(
+    //(q) => q as unknown as VideoQualityEnum
+    (q) => VideoQualityEnum[q]
+  );
+
+  if (qualities.length === 0) return videos;
+
+  const lowQuality = _.orderBy(qualities, undefined, "asc")[0];
+
+  const lowVideos = videos.filter(
+    (v) => VideoQualityEnum[v.quality as VideoQuality] === lowQuality
+  );
+
+  if (lowVideos.length > 0) return lowVideos;
+
+  return videos;
+}
+
+export function getQualityVideosSorted(
+  quality: VideoQuality[]
+): VideoQuality[] {
+  const qualities = quality.map(
+    //(q) => q as unknown as VideoQualityEnum
+    (q) => VideoQualityEnum[q]
+  );
+  return _.orderBy(qualities, undefined, "asc").map(
+    (q) => VideoQualityEnum[q] as VideoQuality
+  );
+}
 
 // minutes and seconds and hours
 export function formatTime(timeInSeconds: number) {
