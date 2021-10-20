@@ -82,10 +82,10 @@ const Video = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [buffered, setBuffered] = useState<number>(0);
   const [fullScreen, setFullScreen] = useState<boolean>(false);
+  const [hoverControlsOnFullScreen, setHoverControlsOnFullScreen] =
+    useState<boolean>(false);
   const [quality, setQuality] = useState<VideoQuality>("1080p");
   const [disabledPIP, setDisabledPIP] = useState<boolean>(false);
-  const [mouseMoving, setMouseMoving] = useState<boolean>(false);
-  const [videoMoving, setVideoMoving] = useState<boolean>(false);
   const [volumeLevel, setVolumeLevel] = useState<VolumeLevel>();
   const [duration, setDuration] = useState<Duration>({
     seconds: "00",
@@ -142,22 +142,29 @@ const Video = ({
 
       if (
         (window as any).prev_x != null &&
-        (window as any).prev_x != e.clientX
+        (window as any).prev_x != e.clientX &&
+        (window as any).prev_y != e.clientY
       ) {
         setShowControls(true);
         defaultCursor(videoRef);
       }
 
       (window as any).prev_x = e.clientX;
+      (window as any).prev_y = e.clientY;
 
       let timeout;
       (() => {
         clearTimeout(timeout);
         timeout = setTimeout(
           () => {
-            if (fullScreen) {
-              setShowControls(false);
-              removeCursor(videoRef);
+            if (
+              (window as any).prev_x === e.clientX &&
+              (window as any).prev_y === e.clientY
+            ) {
+              if (fullScreen) {
+                setShowControls(false);
+                removeCursor(videoRef);
+              }
             }
           },
           CONTROLSHIDETIME,
@@ -418,13 +425,25 @@ const Video = ({
           Your browser does not support HTML5 video.
         </video>
         {controls ? (
-          <VideoControls show={showControls} fullScreen={fullScreen}>
+          <VideoControls
+            show={showControls}
+            fullScreen={fullScreen}
+            hoverControlsOnFullScreen={hoverControlsOnFullScreen}
+          >
             <PlayIcons
               playing={isPlaying}
               togglePlay={() => togglePlay()}
               color={buttonsColor}
+              onMouseMove={setMouseVideoMove}
             />
-            <Controls>
+            <Controls
+              onMouseEnter={() => {
+                if (fullScreen) setHoverControlsOnFullScreen(true);
+              }}
+              onMouseLeave={() => {
+                if (fullScreen) setHoverControlsOnFullScreen(false);
+              }}
+            >
               <LeftControls>
                 <Volume
                   onChange={updateVolume}

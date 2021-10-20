@@ -9,6 +9,7 @@ interface VideoControlsProps {
   show?: boolean;
   onClick?: () => void;
   fullScreen?: boolean;
+  hoverControlsOnFullScreen?: boolean;
 }
 
 const VideoControls = ({
@@ -16,6 +17,7 @@ const VideoControls = ({
   show,
   onClick,
   fullScreen,
+  hoverControlsOnFullScreen,
 }: VideoControlsProps) => {
   const [showControls, setShowControls] = useState<boolean>(false);
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -30,9 +32,15 @@ const VideoControls = ({
     })();
   };
 
+  const getShowControls = () => {
+    if (hoverControlsOnFullScreen) return hoverControlsOnFullScreen;
+
+    return show || showControls;
+  };
+
   return (
     <VideoControlsStyled
-      className={cn({ [styles.show]: show || showControls })}
+      className={cn({ [styles.show]: getShowControls() })}
       onMouseEnter={() => {
         if (!fullScreen) {
           setShowControls(true);
