@@ -61,10 +61,26 @@ const videos2: VideoList[] = [
 
 const tags: VideoTags[] = [
   {
-    tag: "test1",
+    tag: "primera parte",
+    time: {
+      hours: "0",
+      seconds: "00",
+      minutes: "00",
+    },
+  },
+  {
+    tag: "segunda",
     time: {
       hours: "0",
       seconds: "12",
+      minutes: "00",
+    },
+  },
+  {
+    tag: "tercera",
+    time: {
+      hours: "0",
+      seconds: "22",
       minutes: "00",
     },
   },
@@ -84,7 +100,7 @@ function App() {
           muted
           loop
           rounded
-          controls={false}
+          controls
           tags={tags}
           // buttonsColor="red"
           // volumeColor={{

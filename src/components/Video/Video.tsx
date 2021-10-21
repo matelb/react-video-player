@@ -86,7 +86,7 @@ const Video = ({
   const [fullScreen, setFullScreen] = useState<boolean>(false);
   const [hoverControlsOnFullScreen, setHoverControlsOnFullScreen] =
     useState<boolean>(false);
-  const [quality, setQuality] = useState<VideoQuality>("1080p");
+  const [quality, setQuality] = useState<VideoQuality>("720p");
   const [disabledPIP, setDisabledPIP] = useState<boolean>(false);
   const [volumeLevel, setVolumeLevel] = useState<VolumeLevel>();
   const [duration, setDuration] = useState<Duration>({
@@ -498,7 +498,7 @@ const Video = ({
           </VideoControls>
         ) : null}
       </Container>
-      <button type="button" onClick={() => setShowControls(!showControls)}>
+      {/* <button type="button" onClick={() => setShowControls(!showControls)}>
         Hide
       </button>
       <input
@@ -517,8 +517,8 @@ const Video = ({
             src="http://edge-assets.wirewax.com/blog/vidData/example1080.webm"
             type="video/webm"
           />
-        </video>
-      </Container>
+        </video> */}
+      {/* </Container> */}
     </>
   );
 };

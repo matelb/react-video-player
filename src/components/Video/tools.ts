@@ -43,7 +43,7 @@ export function getQualityVideosSorted(
 }
 
 // minutes and seconds and hours
-export function formatTime(timeInSeconds: number) {
+export function formatTime(timeInSeconds: number): Time {
   const result = new Date(timeInSeconds * 1000).toISOString().substr(11, 8);
   const hours = result.substr(0, 2);
   return {

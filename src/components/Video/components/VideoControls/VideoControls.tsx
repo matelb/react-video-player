@@ -40,7 +40,7 @@ const VideoControls = ({
 
   return (
     <VideoControlsStyled
-      className={cn({ [styles.show]: getShowControls() })}
+      className={cn({ [styles.show]: true })}
       onMouseEnter={() => {
         if (!fullScreen) {
           setShowControls(true);

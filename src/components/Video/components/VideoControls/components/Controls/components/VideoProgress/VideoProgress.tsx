@@ -5,6 +5,7 @@ import { VideoTags } from "../../../../../../types";
 import { INITIALCONFIGURATION } from "../../../../Utilities/Config";
 import { Duration } from "../TimeElapsed/types";
 import { isMobile, isTablet } from "react-device-detect";
+import { getTag } from "./helper";
 
 interface VideoProgressProps {
   max: number;
@@ -34,11 +35,7 @@ const VideoProgress = ({
   const seekRef = useRef<HTMLInputElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [dataSeek, setDataSeek] = useState<number>(0);
-  const [tooltipTime, setTooltipTime] = useState<Duration>({
-    minutes: "00",
-    seconds: "00",
-    hours: "00",
-  });
+  const [tooltipTime, setTooltipTime] = useState<number>(0);
 
   const updateTooltip = (
     event: React.MouseEvent<HTMLInputElement, MouseEvent>
@@ -52,8 +49,8 @@ const VideoProgress = ({
         (offsetX / clientWidth) * parseInt(max.toString(), 10)
       );
       setDataSeek(skipTo);
-      const time = formatTime(skipTo);
-      setTooltipTime(time);
+
+      setTooltipTime(skipTo);
       tooltip.style.left = `${Math.round((skipTo / max) * 100)}%`;
     }
   };
@@ -67,22 +64,71 @@ const VideoProgress = ({
     onSkip(skipTo);
   };
 
-  //console.log({ progress });
+  const renderTags = () => {
+    if (!tags) return;
+    return tags.map((tag, i) => {
+      //if 0 return
+      if (
+        !Number(tag.time.seconds) &&
+        !Number(tag.time.minutes) &&
+        !Number(tag.time.hours)
+      )
+        return <></>;
+      const totalTime = new Date(max).getTime();
+      const time = new Date(
+        Number(tag.time.hours) * 3600 +
+          Number(tag.time.minutes) * 60 +
+          Number(tag.time.seconds)
+      ).getTime();
+
+      if (totalTime === time) return <></>;
+
+      const elapsed = new Date(progress).getTime();
+      const percent = getPercentageOfTotal(max, tag.time);
+
+      return (
+        <Tag
+          key={i}
+          style={{ left: `${percent}%` }}
+          color={textColor}
+          elapsed={time < elapsed}
+        >
+          <TagSpan>
+            <p>{tag.tag}</p>
+            <p>
+              {tag.time.hours}:{tag.time.minutes}:{tag.time.seconds}
+            </p>
+          </TagSpan>
+        </Tag>
+      );
+    });
+  };
+
+  const renderTooltip = () => {
+    if (!isMobile && !isTablet) {
+      const time = formatTime(tooltipTime);
+      const tag = getTag(tags, tooltipTime);
+
+      return (
+        <>
+          <Tooltip ref={tooltipRef} color={textColor}>
+            <span>
+              {tag ? <p>{tag.tag}</p> : null}
+              <p>
+                {time.hours}:{time.minutes}:{time.seconds}
+              </p>
+            </span>
+          </Tooltip>
+        </>
+      );
+    }
+
+    return;
+  };
 
   return (
     <VideoProgressStyled>
-      {tags ? (
-        <>
-          {tags.map((tag, i) => {
-            const percent = getPercentageOfTotal(max, tag.time);
-            return (
-              <Tag key={i} style={{ left: percent }} color={textColor}>
-                <TagSpan>{tag.tag}</TagSpan>
-              </Tag>
-            );
-          })}
-        </>
-      ) : null}
+      {renderTags()}
       <Seek
         ref={seekRef}
         id="seek"
@@ -103,13 +149,7 @@ const VideoProgress = ({
         backgroundBarColor={backgroundBarColor}
         thumbColor={thumbColor}
       />
-      {!isMobile && !isTablet ? (
-        <Tooltip ref={tooltipRef} color={textColor}>
-          <span>
-            {tooltipTime.hours}:{tooltipTime.minutes}:{tooltipTime.seconds}
-          </span>
-        </Tooltip>
-      ) : null}
+      {renderTooltip()}
     </VideoProgressStyled>
   );
 };
@@ -132,8 +172,8 @@ const Tooltip = styled.div`
   opacity: 0;
   visibility: hidden;
   position: absolute;
-  top: -30px;
   left: 0;
+  z-index: -1;
   margin-left: -15px;
   font-size: 12px;
   padding: 3px;
@@ -144,32 +184,65 @@ const Tooltip = styled.div`
   background-color: transparent;
   transition: visibility 0.25s ease-out, opacity 0.25s ease-out,
     transform 0.25s ease-out;
-  transform: translateY(0.5rem);
+  transform: translateY(0);
+  > span > p {
+    margin: 0;
+  }
+`;
+
+const TagSpan = styled.span`
+  font-size: 0.8em;
+  position: absolute;
+  opacity: 0;
+  font-size: 12px;
+  left: -50%;
+  visibility: hidden;
+  transition: visibility 0.25s ease-out, opacity 0.25s ease-out,
+    transform 0.25s ease-out;
+  transform: translateY(-3.5em);
+  > p {
+    margin: 0;
+  }
 `;
 
 interface TagProps {
   color?: string;
+  elapsed?: boolean;
 }
 const Tag = styled.div`
-  opacity: 0;
-  visibility: hidden;
   position: absolute;
-  top: -30px;
+  //top: -10px;
+  z-index: 1;
   left: 0;
+  width: 15px;
+  max-width: 3.5px;
+  height: 15px;
+  max-height: 8px;
   margin-left: -15px;
   font-size: 12px;
-  padding: 3px;
   content: attr(data-title);
   font-weight: bold;
+  margin: 0;
   color: ${(props: TagProps) =>
     props.color || INITIALCONFIGURATION.BUTTONCOLOR};
-  background-color: transparent;
-  transition: visibility 0.25s ease-out, opacity 0.25s ease-out,
-    transform 0.25s ease-out;
-  transform: translateY(0.5rem);
-`;
-const TagSpan = styled.span`
-  font-size: 0.8rem;
+  background-color: ${(props: TagProps) =>
+    props.elapsed
+      ? props.color
+        ? props.color
+        : INITIALCONFIGURATION.BUTTONCOLOR
+      : INITIALCONFIGURATION.ProgressBar.PROGRESSCOLOR};
+  transition: all 0.2s;
+  &:hover {
+    max-width: 12px;
+    max-height: 12px;
+    transition: all 0.2s;
+    margin: -3.5px;
+    border-radius: 50%;
+    > ${TagSpan} {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 `;
 
 interface SeekProps {
@@ -237,14 +310,8 @@ const Seek = styled.input`
     transition: opacity 0.2s;
   }
   
-  &:hover + ${Tooltip} {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-    transition: visibility 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
-  }
-  &:hover + ${Tag} {
-    transform: translateY(0);
+  &:hover + ${Tooltip} {    
+    transform: translateY(-2.7em);
     opacity: 1;
     visibility: visible;
     transition: visibility 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
