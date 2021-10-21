@@ -108,10 +108,18 @@ const VideoProgress = ({
     if (!isMobile && !isTablet) {
       const time = formatTime(tooltipTime);
       const tag = getTag(tags, tooltipTime);
+      const bounds = tooltipRef.current?.getBoundingClientRect();
+      const marginLeft = bounds ? -bounds.width / 2 : "15px";
 
       return (
         <>
-          <Tooltip ref={tooltipRef} color={textColor}>
+          <Tooltip
+            ref={tooltipRef}
+            color={textColor}
+            style={{
+              marginLeft: marginLeft,
+            }}
+          >
             <span>
               {tag ? <p>{tag.tag}</p> : null}
               <p>
@@ -195,7 +203,7 @@ const TagSpan = styled.span`
   position: absolute;
   opacity: 0;
   font-size: 12px;
-  left: -50%;
+  left: -100%;
   visibility: hidden;
   transition: visibility 0.25s ease-out, opacity 0.25s ease-out,
     transform 0.25s ease-out;

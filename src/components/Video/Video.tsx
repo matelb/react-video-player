@@ -25,41 +25,8 @@ import {
   TotalTime,
 } from "./components/VideoControls/components/Controls/components/TimeElapsed";
 import { CONTROLSHIDETIME } from "./components/VideoControls/Utilities/Config";
-import { Preload, VideoList, VideoQuality, VideoTags } from "./types";
+import { VideoProps, VideoQuality } from "./types";
 import _ from "lodash";
-
-interface VideoProps {
-  videos: VideoList[];
-  loop?: boolean;
-  autoPlay?: boolean;
-  poster?: string;
-  playsInline?: boolean;
-  preload?: Preload;
-  className?: string;
-  width?: string;
-  height?: string;
-  rounded?: boolean;
-  controls?: boolean;
-  muted?: boolean;
-  tags?: VideoTags[];
-  buttonsColor?: string;
-  volumeColor?: {
-    background?: string;
-    thumb?: string;
-    bar?: string;
-    container?: string;
-  };
-  progressColor?: {
-    background?: string;
-    thumb?: string;
-    bar?: string;
-    buffered?: string;
-    text?: string;
-  };
-  time?: {
-    color: string;
-  };
-}
 
 const Video = ({
   videos,
@@ -79,6 +46,14 @@ const Video = ({
   progressColor,
   time,
   muted,
+  defaultVideoQuality,
+  onEnd,
+  onMuted,
+  onUpdateVolume,
+  onFullScreen,
+  onQualityChange: onQualityChangeCallback,
+  onTogglePip,
+  onTogglePlay,
 }: VideoProps) => {
   const [showControls, setShowControls] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -86,7 +61,9 @@ const Video = ({
   const [fullScreen, setFullScreen] = useState<boolean>(false);
   const [hoverControlsOnFullScreen, setHoverControlsOnFullScreen] =
     useState<boolean>(false);
-  const [quality, setQuality] = useState<VideoQuality>("720p");
+  const [quality, setQuality] = useState<VideoQuality>(
+    defaultVideoQuality || "720p"
+  );
   const [disabledPIP, setDisabledPIP] = useState<boolean>(false);
   const [volumeLevel, setVolumeLevel] = useState<VolumeLevel>();
   const [duration, setDuration] = useState<Duration>({
@@ -131,16 +108,15 @@ const Video = ({
     }
   };
 
-  const onMouseMove = (
-    e: React.MouseEvent<HTMLVideoElement | HTMLDivElement, MouseEvent>
-  ) => {
-    // e.preventDefault();
-    if (!fullScreen) {
-      // setShowControls(true);
-      defaultCursor(videoContainerRef);
-      return;
-    }
-  };
+  const onMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLVideoElement | HTMLDivElement, MouseEvent>) => {
+      if (!fullScreen) {
+        defaultCursor(videoContainerRef);
+        return;
+      }
+    },
+    []
+  );
 
   const setMouseVideoMove = useCallback(
     (e: React.MouseEvent<HTMLVideoElement | HTMLDivElement, MouseEvent>) => {
@@ -188,8 +164,10 @@ const Video = ({
     if (video) {
       if (video.paused || video.ended) {
         video.play();
+        if (onTogglePlay) onTogglePlay(true);
       } else {
         video.pause();
+        if (onTogglePlay) onTogglePlay(false);
       }
     }
   };
@@ -208,12 +186,11 @@ const Video = ({
     const video = videoRef.current;
     if (video) {
       const currentTime = video.currentTime;
-      if (currentTime > 0) {
-        const time = formatTime(Math.round(video.currentTime));
+      const duration = video.duration;
+      if (currentTime > 0 && duration > 0) {
+        const time = formatTime(Math.round(currentTime));
         setTimeElapsed(time);
-        const timeLeft = formatTime(
-          Math.round(video.duration - video.currentTime)
-        );
+        const timeLeft = formatTime(Math.round(duration - currentTime));
         setDuration(timeLeft);
       }
     }
@@ -230,7 +207,13 @@ const Video = ({
     const video = videoRef.current;
     if (video) {
       setProgress(Math.round(video.duration));
-      exitFullScreen();
+      defaultCursor(videoRef);
+      setFullScreen(false);
+      setHoverControlsOnFullScreen(false);
+      if (document && document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+      if (onEnd) onEnd();
     }
   };
 
@@ -243,6 +226,8 @@ const Video = ({
       const volume = Number(value) / 100;
       setVolumeLevel(getVolumeLevel(videoRef.current?.muted, volume));
       video.volume = volume;
+      if (onUpdateVolume) onUpdateVolume(volume);
+      if (volume === 0 && onMuted) onMuted(true);
     }
   };
 
@@ -252,6 +237,7 @@ const Video = ({
       const muted = !video.muted;
       setVolumeLevel(getVolumeLevel(muted, videoRef.current?.volume));
       video.muted = muted;
+      if (onMuted) onMuted(muted);
     }
   };
 
@@ -271,6 +257,7 @@ const Video = ({
         defaultCursor(videoRef);
         setFullScreen(false);
         setHoverControlsOnFullScreen(false);
+        if (onFullScreen) onFullScreen(false);
         // } else if ((document as any).webkitFullscreenElement) {
         //   //Need this to support Safari
         //   (document as any).webkitExitFullscreen();
@@ -282,16 +269,17 @@ const Video = ({
       } else {
         videoContainer.requestFullscreen();
         setFullScreen(true);
+        if (onFullScreen) onFullScreen(true);
       }
     }
   };
 
   const exitFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.exitFullscreen();
+    if (document && !document.fullscreenElement) {
       defaultCursor(videoRef);
       setFullScreen(false);
       setHoverControlsOnFullScreen(false);
+      if (onFullScreen) onFullScreen(false);
     }
   };
 
@@ -302,8 +290,10 @@ const Video = ({
         if (video !== document.pictureInPictureElement) {
           setDisabledPIP(true);
           await video.requestPictureInPicture();
+          if (onTogglePip) onTogglePip(true);
         } else {
           await document.exitPictureInPicture();
+          if (onTogglePip) onTogglePip(false);
         }
       } catch (error) {
         console.error(error);
@@ -313,8 +303,6 @@ const Video = ({
     }
   };
 
-  // keyboardShortcuts executes the relevant functions for
-  // each supported shortcut key
   function keyboardShortcuts(event: KeyboardEvent) {
     const { key } = event;
     const video = videoRef.current;
@@ -323,7 +311,6 @@ const Video = ({
       switch (key) {
         case "k":
           togglePlay();
-          //animatePlayback();
           if (video.paused) {
             setShowControls(true);
           } else {
@@ -345,7 +332,9 @@ const Video = ({
     }
   }
 
-  const onProgress = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+  const onBufferProgress = (
+    event: React.SyntheticEvent<HTMLVideoElement, Event>
+  ) => {
     const video = event.currentTarget;
     if (video) {
       var range = 0;
@@ -372,6 +361,7 @@ const Video = ({
     if (video) {
       setQuality(quality);
       video.load();
+      if (onQualityChangeCallback) onQualityChangeCallback(quality);
     }
   };
 
@@ -419,7 +409,7 @@ const Video = ({
             updateTimeElapsed();
             updateProgress();
           }}
-          onProgress={(v) => onProgress(v)}
+          onProgress={(v) => onBufferProgress(v)}
         >
           {getVideos(videos, quality).map((video, i) => (
             <source src={video.src} type={video.type} key={i}></source>
@@ -498,27 +488,6 @@ const Video = ({
           </VideoControls>
         ) : null}
       </Container>
-      {/* <button type="button" onClick={() => setShowControls(!showControls)}>
-        Hide
-      </button>
-      <input
-        type="range"
-        onChange={(value) => console.log({ range: value.target.value })}
-      ></input>
-      <span>Buffered {buffered}</span>
-      <Container
-        width={width}
-        height={height}
-        className={className}
-        rounded={rounded}
-      >
-        <video autoPlay loop controls>
-          <source
-            src="http://edge-assets.wirewax.com/blog/vidData/example1080.webm"
-            type="video/webm"
-          />
-        </video> */}
-      {/* </Container> */}
     </>
   );
 };

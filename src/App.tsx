@@ -15,24 +15,24 @@ const videos: VideoList[] = [
 
 const videos3: VideoList[] = [
   {
-    quality: "4k",
-    type: "video/mp4",
-    src: "forest.mp4",
-  },
-  {
-    quality: "480p",
-    type: "video/mp4",
-    src: "forest.mp4",
-  },
-  {
     quality: "720p",
     type: "video/mp4",
-    src: "forest.mp4",
+    src: "videos/720.mp4",
   },
   {
-    quality: "1080p",
-    type: "video/webm",
-    src: "http://edge-assets.wirewax.com/blog/vidData/example1080.webm",
+    quality: "360p",
+    //type: "video/avi",
+    src: "videos/360.mp4",
+  },
+  {
+    quality: "640p",
+    //type: "video/avi",
+    src: "videos/640.mp4",
+  },
+  {
+    quality: "1280p",
+    //type: "video/avi",
+    src: "videos/1280.mp4",
   },
 ];
 
