@@ -81,9 +81,10 @@ function App() {
           preload="auto"
           autoPlay
           //playsInline
+          muted
           loop
           rounded
-          controls
+          controls={false}
           tags={tags}
           // buttonsColor="red"
           // volumeColor={{

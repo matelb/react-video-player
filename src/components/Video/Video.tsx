@@ -40,6 +40,7 @@ interface VideoProps {
   height?: string;
   rounded?: boolean;
   controls?: boolean;
+  muted?: boolean;
   tags?: VideoTags[];
   buttonsColor?: string;
   volumeColor?: {
@@ -77,6 +78,7 @@ const Video = ({
   buttonsColor,
   progressColor,
   time,
+  muted,
 }: VideoProps) => {
   const [showControls, setShowControls] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -106,20 +108,26 @@ const Video = ({
     const video = videoRef.current;
     if (video) {
       video.controls = false;
-      video.volume = 1;
+      initialVolume();
       document.addEventListener("keyup", keyboardShortcuts);
-      document.addEventListener("fullscreenchange", () => exitFullscreen());
+      document.addEventListener("fullscreenchange", () => exitFullScreen());
     }
     return () => {
       document.removeEventListener("keyup", keyboardShortcuts);
-      document.removeEventListener("fullscreenchange", () => exitFullscreen());
+      document.removeEventListener("fullscreenchange", () => exitFullScreen());
     };
   }, []);
 
-  const exitFullscreen = () => {
-    if (!document.fullscreenElement) {
-      defaultCursor(videoRef);
-      setFullScreen(false);
+  const initialVolume = () => {
+    const video = videoRef.current;
+    if (video) {
+      if (muted) {
+        video.volume = 0;
+        setVolumeLevel("muted");
+      } else {
+        video.volume = 1;
+        setVolumeLevel("high");
+      }
     }
   };
 
@@ -222,7 +230,7 @@ const Video = ({
     const video = videoRef.current;
     if (video) {
       setProgress(Math.round(video.duration));
-      closeFullScreen();
+      exitFullScreen();
     }
   };
 
@@ -262,6 +270,7 @@ const Video = ({
         document.exitFullscreen();
         defaultCursor(videoRef);
         setFullScreen(false);
+        setHoverControlsOnFullScreen(false);
         // } else if ((document as any).webkitFullscreenElement) {
         //   //Need this to support Safari
         //   (document as any).webkitExitFullscreen();
@@ -277,20 +286,12 @@ const Video = ({
     }
   };
 
-  const closeFullScreen = () => {
-    const videoContainer = videoContainerRef.current;
-    if (videoContainer) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-        defaultCursor(videoRef);
-        setFullScreen(false);
-      }
-      //  else if ((document as any).webkitFullscreenElement) {
-      //   //Need this to support Safari
-      //   (document as any).webkitExitFullscreen();
-      //   setFullScreen(false);
-      //   defaultCursor();
-      // }
+  const exitFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.exitFullscreen();
+      defaultCursor(videoRef);
+      setFullScreen(false);
+      setHoverControlsOnFullScreen(false);
     }
   };
 
@@ -395,6 +396,7 @@ const Video = ({
           preload={preload}
           poster={poster}
           loop={loop}
+          muted={muted}
           onMouseMove={(event) => setMouseVideoMove(event)}
           onMouseEnter={() => {
             if (!fullScreen) {
