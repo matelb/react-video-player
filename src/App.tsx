@@ -102,14 +102,21 @@ function App() {
           rounded
           controls
           tags={tags}
-          // buttonsColor="red"
-          // volumeColor={{
-          //   thumb: "yellow",
-          // }}
-          // progressColor={{
-          //   thumb: "yellow",
-          // }}
-          // time={{ color: "red" }}
+          buttonsColor="red"
+          volumeColor={{
+            thumb: "yellow",
+          }}
+          progressColor={{
+            thumb: "yellow",
+            bar: "orange",
+            buffered: "green",
+            text: "purple",
+          }}
+          qualitySelectorColor={{
+            background: "blue",
+            textColor: { primary: "yellow", selected: "red" },
+          }}
+          time={{ color: "red" }}
         />
       </div>
     </div>

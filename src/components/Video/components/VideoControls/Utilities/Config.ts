@@ -19,4 +19,11 @@ export const INITIALCONFIGURATION = {
   Time: {
     COLOR: Color.COLORBASE,
   },
+  QualitySelector: {
+    BACKGROUND: Color.COLORBASE,
+    TEXTCOLOR: {
+      PRIMARY: Color.BLACK,
+      SELECTED: Color.LIGHTBLACK,
+    },
+  },
 };

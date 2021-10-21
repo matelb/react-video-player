@@ -7,4 +7,6 @@ export enum Color {
   LIGHTGRAY = "rgba(106, 106, 106, 0.8)",
   GREEN = "#04aa6d",
   LIGHTBLUE = "#bfeaf5",
+  BLACK = "rgba(0,0,0,.95)",
+  LIGHTBLACK = "rgba(0,0,0,.67)",
 }

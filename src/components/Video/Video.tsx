@@ -44,6 +44,7 @@ const Video = ({
   volumeColor,
   buttonsColor,
   progressColor,
+  qualitySelectorColor,
   time,
   muted,
   defaultVideoQuality,
@@ -458,6 +459,7 @@ const Video = ({
                 onSkip={handleSkip}
                 buffered={buffered}
                 tags={tags}
+                buttonColor={buttonsColor}
                 backgroundBarColor={progressColor?.background}
                 barColor={progressColor?.bar}
                 thumbColor={progressColor?.thumb}
@@ -481,6 +483,16 @@ const Video = ({
                     value={quality}
                     qualities={qualities}
                     onChange={onQualityChange}
+                    buttonColor={buttonsColor}
+                    background={qualitySelectorColor?.background}
+                    textColor={{
+                      primary: qualitySelectorColor?.textColor
+                        ? qualitySelectorColor?.textColor.primary
+                        : undefined,
+                      selected: qualitySelectorColor?.textColor
+                        ? qualitySelectorColor?.textColor.selected
+                        : undefined,
+                    }}
                   />
                 ) : null}
               </RightControls>
@@ -491,6 +503,7 @@ const Video = ({
     </>
   );
 };
+//selected: qualitySelectorColor?.textColor.selected,
 
 export default Video;
 

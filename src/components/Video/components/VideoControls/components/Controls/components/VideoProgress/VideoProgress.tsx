@@ -18,6 +18,7 @@ interface VideoProgressProps {
   barColor?: string;
   textColor?: string;
   thumbColor?: string;
+  buttonColor?: string;
 }
 
 const VideoProgress = ({
@@ -31,6 +32,7 @@ const VideoProgress = ({
   barColor,
   thumbColor,
   textColor,
+  buttonColor,
 }: VideoProgressProps) => {
   const seekRef = useRef<HTMLInputElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -91,6 +93,8 @@ const VideoProgress = ({
           key={i}
           style={{ left: `${percent}%` }}
           color={textColor}
+          background={barColor}
+          elapsedColor={buttonColor}
           elapsed={time < elapsed}
         >
           <TagSpan>
@@ -216,6 +220,8 @@ const TagSpan = styled.span`
 interface TagProps {
   color?: string;
   elapsed?: boolean;
+  background?: string;
+  elapsedColor?: string;
 }
 const Tag = styled.div`
   position: absolute;
@@ -235,10 +241,8 @@ const Tag = styled.div`
     props.color || INITIALCONFIGURATION.BUTTONCOLOR};
   background-color: ${(props: TagProps) =>
     props.elapsed
-      ? props.color
-        ? props.color
-        : INITIALCONFIGURATION.BUTTONCOLOR
-      : INITIALCONFIGURATION.ProgressBar.PROGRESSCOLOR};
+      ? props.elapsedColor || INITIALCONFIGURATION.BUTTONCOLOR
+      : props.background || INITIALCONFIGURATION.ProgressBar.PROGRESSCOLOR};
   transition: all 0.2s;
   &:hover {
     max-width: 12px;

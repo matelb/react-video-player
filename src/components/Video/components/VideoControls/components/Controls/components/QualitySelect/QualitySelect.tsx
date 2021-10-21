@@ -3,12 +3,19 @@ import styled from "styled-components";
 import { getQualityVideosSorted } from "../../../../../../tools";
 import { VideoQuality } from "../../../../../../types";
 import { Color } from "../../../../Utilities/Color";
+import { INITIALCONFIGURATION } from "../../../../Utilities/Config";
 
 interface QualitySelectProps {
   qualities: VideoQuality[];
   disabled?: boolean;
   onChange?: (value: VideoQuality) => void;
   value: VideoQuality;
+  buttonColor?: string;
+  background?: string;
+  textColor?: {
+    primary?: string;
+    selected?: string;
+  };
 }
 
 const QualitySelect = ({
@@ -16,6 +23,9 @@ const QualitySelect = ({
   disabled,
   onChange,
   value,
+  buttonColor,
+  background,
+  textColor,
 }: QualitySelectProps) => {
   const [_value, setValue] = useState<VideoQuality>(value);
   const [open, setOpen] = useState<boolean>(false);
@@ -39,7 +49,7 @@ const QualitySelect = ({
         <SVG viewBox="0 0 24 24">
           <g
             transform="matrix(0.00387549,0,0,-0.0038753,0,19.842506)"
-            fill="white"
+            fill={buttonColor || INITIALCONFIGURATION.BUTTONCOLOR}
             stroke="none"
             id="g25"
           >
@@ -65,14 +75,17 @@ const QualitySelect = ({
                 ? `calc(-2rem * ${qualities.length}.5)`
                 : "calc(-2rem * 8.5)",
           }}
+          background={background}
         >
-          <DropDownList>
+          <DropDownList background={background}>
             {getQualityVideosSorted(qualities).map((item, i) => {
               return (
                 <ListItem
                   onClick={onOptionClicked(item)}
                   key={i}
                   selected={item === _value}
+                  color={textColor?.primary}
+                  selectedColor={textColor?.selected}
                 >
                   <ListItemText>{item}</ListItemText>
                 </ListItem>
@@ -105,6 +118,7 @@ const SVG = styled.svg`
 
 interface DropDownListContainerProps {
   open: boolean;
+  background?: string;
 }
 
 const DropDownListContainer = styled.div`
@@ -124,7 +138,8 @@ const DropDownListContainer = styled.div`
   border-bottom-left-radius: 5px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  background-color: #ffffff;
+  background-color: ${(props: DropDownListContainerProps) =>
+    props.background || INITIALCONFIGURATION.QualitySelector.BACKGROUND};
   max-height: ${(props: DropDownListContainerProps) =>
     props.open ? "500px" : "0"};
   max-width: ${(props: DropDownListContainerProps) =>
@@ -137,11 +152,16 @@ const DropDownListContainer = styled.div`
   overflow: hidden;
 `;
 
+interface DropDownListProps {
+  background?: string;
+}
+
 const DropDownList = styled.ul`
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: #ffffff;
+  background-color: ${(props: DropDownListProps) =>
+    props.background || INITIALCONFIGURATION.QualitySelector.BACKGROUND};
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   &:first-child {
@@ -151,6 +171,8 @@ const DropDownList = styled.ul`
 
 interface ListItemProps {
   selected: boolean;
+  selectedColor?: string;
+  color?: string;
 }
 const ListItem = styled.li`
   list-style: none;
@@ -160,19 +182,13 @@ const ListItem = styled.li`
   font-size: 0.8rem;
   font-weight: ${(props: ListItemProps) => (props.selected ? 700 : 400)};
   color: ${(props: ListItemProps) =>
-    props.selected ? "rgba(0,0,0,.95)" : "rgba(0,0,0,.67)"};
+    props.selected
+      ? props.selectedColor ||
+        INITIALCONFIGURATION.QualitySelector.TEXTCOLOR.SELECTED
+      : props.color || INITIALCONFIGURATION.QualitySelector.TEXTCOLOR.PRIMARY};
   &:hover {
     background: rgba(0, 0, 0, 0.05);
     color: rgba(0, 0, 0, 0.95);
   }
 `;
-const ListItemText = styled.span`
-  //padding-left: 0.7rem;
-`;
-const Label = styled.label`
-  display: inline;
-  margin-bottom: 0.5rem;
-  transition: 0.2s;
-  font-size: 0.8rem;
-  color: #606770;
-`;
+const ListItemText = styled.span``;

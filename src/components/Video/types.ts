@@ -89,6 +89,13 @@ export interface VideoProps extends VideoEvents {
     buffered?: string;
     text?: string;
   };
+  qualitySelectorColor?: {
+    background?: string;
+    textColor?: {
+      primary: string;
+      selected: string;
+    };
+  };
   time?: {
     color: string;
   };
