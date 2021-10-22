@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useRef, useState } from "react";
 import styled from "styled-components";
 import { getQualityVideosSorted } from "../../../../../../tools";
 import { VideoQuality } from "../../../../../../types";
-import { Color } from "../../../../Utilities/Color";
 import { INITIALCONFIGURATION } from "../../../../Utilities/Config";
+import { useOutside } from "../../../../Utilities/outsideHook";
 
 interface QualitySelectProps {
   qualities: VideoQuality[];
@@ -16,6 +16,11 @@ interface QualitySelectProps {
     primary?: string;
     selected?: string;
   };
+  borderColor?: string;
+  hover?: {
+    background?: string;
+    color?: string;
+  };
 }
 
 const QualitySelect = ({
@@ -26,9 +31,12 @@ const QualitySelect = ({
   buttonColor,
   background,
   textColor,
+  borderColor,
+  hover,
 }: QualitySelectProps) => {
   const [_value, setValue] = useState<VideoQuality>(value);
   const [open, setOpen] = useState<boolean>(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const onOptionClicked = (item: VideoQuality) => () => {
     if (disabled) return;
@@ -43,8 +51,10 @@ const QualitySelect = ({
     setOpen(false);
   };
 
+  useOutside(containerRef, () => setOpen(false));
+
   return (
-    <Container>
+    <Container ref={containerRef}>
       <Button onClick={() => setOpen(!open)}>
         <SVG viewBox="0 0 24 24">
           <g
@@ -76,6 +86,7 @@ const QualitySelect = ({
                 : "calc(-2rem * 8.5)",
           }}
           background={background}
+          borderColor={borderColor}
         >
           <DropDownList background={background}>
             {getQualityVideosSorted(qualities).map((item, i) => {
@@ -86,6 +97,8 @@ const QualitySelect = ({
                   selected={item === _value}
                   color={textColor?.primary}
                   selectedColor={textColor?.selected}
+                  hoverColor={hover?.color}
+                  hoverBackgroundColor={hover?.background}
                 >
                   <ListItemText>{item}</ListItemText>
                 </ListItem>
@@ -119,6 +132,7 @@ const SVG = styled.svg`
 interface DropDownListContainerProps {
   open: boolean;
   background?: string;
+  borderColor?: string;
 }
 
 const DropDownListContainer = styled.div`
@@ -133,7 +147,9 @@ const DropDownListContainer = styled.div`
   backface-visibility: hidden;
   outline: 0;
   transition: opacity 0.1s ease;
-  border: 1px solid ${Color.LIGHTBLUE};
+  border: 1px solid
+    ${(props: DropDownListContainerProps) =>
+      props.borderColor || INITIALCONFIGURATION.QualitySelector.BORDERCOLOR};
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   border-top-left-radius: 5px;
@@ -173,6 +189,8 @@ interface ListItemProps {
   selected: boolean;
   selectedColor?: string;
   color?: string;
+  hoverColor?: string;
+  hoverBackgroundColor?: string;
 }
 const ListItem = styled.li`
   list-style: none;
@@ -187,8 +205,11 @@ const ListItem = styled.li`
         INITIALCONFIGURATION.QualitySelector.TEXTCOLOR.SELECTED
       : props.color || INITIALCONFIGURATION.QualitySelector.TEXTCOLOR.PRIMARY};
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: rgba(0, 0, 0, 0.95);
+    background: ${(props: ListItemProps) =>
+      props.hoverBackgroundColor ||
+      INITIALCONFIGURATION.QualitySelector.HOVER.BACKGROUND};
+    color: ${(props: ListItemProps) =>
+      props.hoverColor || INITIALCONFIGURATION.QualitySelector.HOVER.COLOR};
   }
 `;
 const ListItemText = styled.span``;

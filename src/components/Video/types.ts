@@ -60,21 +60,7 @@ interface VideoEvents {
   onTogglePlay?: (play: boolean) => void;
 }
 
-export interface VideoProps extends VideoEvents {
-  videos: VideoList[];
-  loop?: boolean;
-  autoPlay?: boolean;
-  poster?: string;
-  playsInline?: boolean;
-  preload?: Preload;
-  className?: string;
-  width?: string;
-  height?: string;
-  rounded?: boolean;
-  controls?: boolean;
-  muted?: boolean;
-  tags?: VideoTags[];
-  defaultVideoQuality?: VideoQuality;
+interface ColorProps {
   buttonsColor?: string;
   volumeColor?: {
     background?: string;
@@ -95,8 +81,30 @@ export interface VideoProps extends VideoEvents {
       primary: string;
       selected: string;
     };
+    borderColor?: string;
+    hover?: {
+      background?: string;
+      color?: string;
+    };
   };
   time?: {
     color: string;
   };
+}
+
+export interface VideoProps extends VideoEvents, ColorProps {
+  videos: VideoList[];
+  loop?: boolean;
+  autoPlay?: boolean;
+  poster?: string;
+  playsInline?: boolean;
+  preload?: Preload;
+  className?: string;
+  width?: string;
+  height?: string;
+  rounded?: boolean;
+  controls?: boolean;
+  muted?: boolean;
+  tags?: VideoTags[];
+  defaultVideoQuality?: VideoQuality;
 }

@@ -115,6 +115,11 @@ function App() {
           qualitySelectorColor={{
             background: "blue",
             textColor: { primary: "yellow", selected: "red" },
+            borderColor: "yellow",
+            hover: {
+              background: "purple",
+              color: "red",
+            },
           }}
           time={{ color: "red" }}
         />

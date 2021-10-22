@@ -9,4 +9,5 @@ export enum Color {
   LIGHTBLUE = "#bfeaf5",
   BLACK = "rgba(0,0,0,.95)",
   LIGHTBLACK = "rgba(0,0,0,.67)",
+  HOVER_BACKGROUND = "rgba(0, 0, 0, 0.05)",
 }

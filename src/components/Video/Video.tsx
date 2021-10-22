@@ -485,14 +485,9 @@ const Video = ({
                     onChange={onQualityChange}
                     buttonColor={buttonsColor}
                     background={qualitySelectorColor?.background}
-                    textColor={{
-                      primary: qualitySelectorColor?.textColor
-                        ? qualitySelectorColor?.textColor.primary
-                        : undefined,
-                      selected: qualitySelectorColor?.textColor
-                        ? qualitySelectorColor?.textColor.selected
-                        : undefined,
-                    }}
+                    textColor={qualitySelectorColor?.textColor}
+                    borderColor={qualitySelectorColor?.borderColor}
+                    hover={qualitySelectorColor?.hover}
                   />
                 ) : null}
               </RightControls>

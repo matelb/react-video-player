@@ -25,5 +25,10 @@ export const INITIALCONFIGURATION = {
       PRIMARY: Color.BLACK,
       SELECTED: Color.LIGHTBLACK,
     },
+    BORDERCOLOR: Color.LIGHTBLUE,
+    HOVER: {
+      BACKGROUND: Color.HOVER_BACKGROUND,
+      COLOR: Color.BLACK,
+    },
   },
 };
